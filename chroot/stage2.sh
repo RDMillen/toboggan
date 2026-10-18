@@ -64,6 +64,14 @@ s_cpuflags() {
 }
 
 s_locale() {
+  if [[ ! -e /usr/share/zoneinfo/$G_TIMEZONE ]]; then
+    echo "Unknown time zone: $G_TIMEZONE (not in /usr/share/zoneinfo)."
+    echo "Fix it with: ln -sf ../usr/share/zoneinfo/<Region/City> /etc/localtime"
+    echo "then skip this step, or correct G_TIMEZONE in /run/toboggan/answers.sh and retry."
+    return 1
+  fi
+  ln -sf "../usr/share/zoneinfo/$G_TIMEZONE" /etc/localtime
+  echo "Time zone: $G_TIMEZONE"
   locale-gen
   eselect locale set "${G_LOCALE%%.*}.utf8" || eselect locale set C.utf8
   env-update

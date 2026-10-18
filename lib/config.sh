@@ -49,6 +49,10 @@ config_load_answers() {
   done
 }
 
+# Time zone names are checked for shape only here. The live medium's own
+# zoneinfo can be incomplete; the real check runs in the new system (s_locale).
+valid_tz() { [[ $1 =~ ^(UTC|[A-Z][A-Za-z_+-]*(/[A-Za-z0-9_+-]+){1,2})$ ]]; }
+
 _in() { local v=$1 x; shift; for x; do [[ $v == "$x" ]] && return 0; done; return 1; }
 
 # Prints one problem per line; returns 1 if there are any.
@@ -80,7 +84,7 @@ validate_config() {
   if has_word nvidia "$G_VIDEO_CARDS" && has_word nouveau "$G_VIDEO_CARDS"; then
     e+=("Choose either the proprietary NVIDIA driver or nouveau, not both."); fi
   [[ $G_LOCALE =~ ^[a-z]{2,3}_[A-Z]{2}\.UTF-8$ ]] || e+=("Locale should look like en_GB.UTF-8.")
-  if [[ -d /usr/share/zoneinfo && ! -f /usr/share/zoneinfo/$G_TIMEZONE ]]; then e+=("Unknown time zone: $G_TIMEZONE."); fi
+  valid_tz "$G_TIMEZONE" || e+=("Time zone should look like Europe/London or UTC.")
   [[ $G_HOSTNAME =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,62}$ ]] || e+=("Hostname may only contain letters, digits and hyphens.")
   [[ $G_USERNAME =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || e+=("Username must be lowercase letters, digits, - or _.")
   [[ -s $(secret_path root_pass) ]] || e+=("No root password set.")

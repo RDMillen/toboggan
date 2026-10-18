@@ -151,7 +151,6 @@ cfg_system_files() {
     printf 'KEYMAP=%s\n' "$G_KEYMAP" | wfile /etc/vconsole.conf
   fi
   printf '%s\n' "$G_KERNEL_CMDLINE" | wfile /etc/kernel/cmdline
-  run ln -sf "../usr/share/zoneinfo/$G_TIMEZONE" "$TARGET/etc/localtime"
 }
 
 configure_all() {

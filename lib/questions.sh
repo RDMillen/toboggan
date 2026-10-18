@@ -153,8 +153,10 @@ q_locale() {
   answer_set G_LOCALE "$v"
   while :; do
     v=$(ui_input "Time zone" "Time zone (Region/City):" "$G_TIMEZONE")
-    [[ ! -d /usr/share/zoneinfo || -f /usr/share/zoneinfo/$v ]] && break
-    ui_msg "Time zone" "Unknown time zone '$v'. Examples: Europe/London, America/New_York, UTC"
+    v=${v//[[:space:]]/}
+    if [[ ${v^^} == UTC ]]; then v=UTC; fi
+    valid_tz "$v" && break
+    ui_msg "Time zone" "'$v' doesn't look like a time zone. Use Region/City, e.g. Europe/London, America/New_York, or UTC."
   done
   answer_set G_TIMEZONE "$v"
   answer_set G_KEYMAP "$(ui_input "Keyboard" "Console keymap (e.g. us, uk, de, fr):" "$G_KEYMAP")"
