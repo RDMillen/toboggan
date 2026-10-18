@@ -15,6 +15,10 @@ q_number() { # title text default min max
 
 q_new_password() { # secret-name title
   local p1 p2
+  # Going back through the questions: keep what was already entered?
+  if [[ -s $(secret_path "$1") ]] && ui_choice "$2" "Keep the ${2,,} you entered earlier?" "Keep" "Change"; then
+    return 0
+  fi
   while :; do
     p1=$(ui_password "$2" "Enter the ${2,,}:")
     p2=$(ui_password "$2" "Enter it again:")
@@ -181,7 +185,6 @@ q_identity() {
 }
 
 q_all() {
-  q_welcome
   q_disk; q_filesystem; q_luks; q_swap
   q_init; q_desktop; q_graphics
   q_kernel; q_initramfs; q_bootloader

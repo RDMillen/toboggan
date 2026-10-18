@@ -56,6 +56,18 @@ ui_yesno() {
   "$DIALOG" --backtitle "$BACKTITLE" --title "$1" --yesno "$2" "$UI_H" "$UI_W"
 }
 
+# Two-button question with custom labels; long text scrolls. 0 = first button.
+ui_choice() { # title text yes-label no-label
+  if [[ $DIALOG == plain ]]; then printf '\n[%s]\n%b\n' "$1" "$2"; [[ $ASSUME_YES == 1 ]]; return; fi
+  if [[ $DIALOG == dialog ]]; then
+    dialog --backtitle "$BACKTITLE" --title "$1" --yes-label "$3" --no-label "$4" \
+      --scrollbar --yesno "$2" "$UI_H" "$UI_W"
+  else
+    whiptail --backtitle "$BACKTITLE" --title "$1" --yes-button "$3" --no-button "$4" \
+      --scrolltext --yesno "$2" "$UI_H" "$UI_W"
+  fi
+}
+
 ui_input()    { _ui --title "$1" --inputbox "$2" "$UI_H" "$UI_W" "${3:-}"; }
 ui_password() { _ui --title "$1" --insecure --passwordbox "$2" "$UI_H" "$UI_W"; }
 ui_menu()     { _ui --title "$1" --menu "$2" "$UI_H" "$UI_W" $((UI_H - 9)) "${@:3}"; }

@@ -89,13 +89,18 @@ preflight_network() {
   done
 }
 
+# Returns 0 to install, 1 to go back and change answers.
 confirm_install() {
   if [[ $ASSUME_YES == 1 ]]; then cat "$RUNDIR/summary.txt"; return 0; fi
-  ui_textbox "Review your choices (scroll with the arrow keys)" "$RUNDIR/summary.txt"
-  ui_yesno "Ready?" "Start the installation onto $G_DISK?" || { clear; exit 0; }
+  ui_choice "Review your choices" \
+    "$(cat "$RUNDIR/summary.txt")\n\nConfirm to continue, or go Back to change your answers." \
+    "Confirm" "Back" || return 1
   local typed
-  typed=$(ui_input "Final confirmation" "This ERASES EVERYTHING on $G_DISK.\n\nType $G_DISK to confirm:" "")
-  if [[ $typed != "$G_DISK" ]]; then ui_msg "Cancelled" "That didn't match, so nothing was changed."; clear; exit 1; fi
+  typed=$(ui_input "Final confirmation" "This ERASES EVERYTHING on $G_DISK.\n\nType $G_DISK to start the installation:" "")
+  if [[ $typed != "$G_DISK" ]]; then
+    ui_msg "Not confirmed" "That didn't match $G_DISK, so nothing has been changed. Taking you back to your answers."
+    return 1
+  fi
 }
 
 install_run() {
@@ -134,17 +139,21 @@ main() {
   if [[ -n $ANSWERS_IN ]]; then config_load_answers "$ANSWERS_IN"; fi
   config_defaults
   preflight_network
-  if [[ -z $ANSWERS_IN ]]; then q_all; fi
+  if [[ -z $ANSWERS_IN ]]; then q_welcome; q_all; fi
 
   local errs
-  until errs=$(validate_config); do
-    if [[ $DIALOG == plain || -n $ANSWERS_IN ]]; then die $'Invalid configuration:\n'"$errs"; fi
-    ui_msg "Please fix these" "$errs\n\nThe questions will run again with your answers as defaults."
+  while :; do
+    until errs=$(validate_config); do
+      if [[ $DIALOG == plain || -n $ANSWERS_IN ]]; then die $'Invalid configuration:\n'"$errs"; fi
+      ui_msg "Please fix these" "$errs\n\nThe questions will run again with your answers as defaults."
+      q_all
+    done
+    config_derive
+    summary_text >"$RUNDIR/summary.txt"
+    confirm_install && break
+    # Back: the questions again, with the current answers as defaults.
     q_all
   done
-  config_derive
-  summary_text >"$RUNDIR/summary.txt"
-  confirm_install
   install_run
 
   if [[ $DIALOG == plain ]]; then msg "Installation complete. Log: $TARGET/var/log/toboggan"; return 0; fi
