@@ -113,6 +113,12 @@ cfg_package_files() {
   if [[ $G_DESKTOP != none ]]; then
     echo 'media-video/pipewire sound-server' | wfile /etc/portage/package.use/pipewire
   fi
+  if [[ $G_KERNEL == bin ]]; then
+    # Anything depending on virtual/dist-kernel would otherwise pull in the
+    # compile-from-source gentoo-kernel before gentoo-kernel-bin is installed.
+    printf '%s\n' '# toboggan: use the prebuilt kernel (gentoo-kernel-bin) only' \
+      sys-kernel/gentoo-kernel sys-kernel/vanilla-kernel | wfile /etc/portage/package.mask/toboggan-kernel
+  fi
   {
     echo 'sys-firmware/intel-microcode intel-ucode'
     if has_word nvidia "$G_VIDEO_CARDS"; then echo 'x11-drivers/nvidia-drivers NVIDIA-r2'; fi
