@@ -39,10 +39,6 @@ cd toboggan
 ./toboggan
 ```
 
-## Running It
-
-
-
 ## Issues and PRs 
 
 Please report issues or subimt PRs at your leisure. 
