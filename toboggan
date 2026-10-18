@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# toboggan - a guided Gentoo Linux installer, run from the live medium.
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -Euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: toboggan [options]
+
+  -a, --answers FILE   Read all answers from FILE (see examples/answers.conf)
+  -y, --yes            Don't ask for final confirmation (unattended installs)
+  -n, --dry-run        Print the commands instead of running them; config
+                       files are written under the target (default /tmp/toboggan-dryrun)
+  -t, --target DIR     Mount point for the new system (default /mnt/gentoo)
+      --plain          No dialog UI (needs --answers and --yes)
+  -h, --help           Show this help
+EOF
+}
+
+ANSWERS_IN=""
+while (( $# )); do
+  case $1 in
+    -a|--answers) ANSWERS_IN=$(readlink -f "$2"); shift ;;
+    -y|--yes)     export ASSUME_YES=1 ;;
+    -n|--dry-run) export DRYRUN=1 ;;
+    -t|--target)  export TARGET=$2; shift ;;
+    --plain)      export DIALOG=plain ;;
+    -h|--help)    usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+  esac
+  shift
+done
+if [[ ${DRYRUN:-0} == 1 ]]; then
+  export TARGET=${TARGET:-/tmp/toboggan-dryrun} RUNDIR=/tmp/toboggan-dryrun-run
+else
+  export RUNDIR=/run/toboggan
+fi
+
+TOBOGGAN_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
+for lib in common ui hw config questions disk stage3 configure kconfig chroot kernel; do
+  # shellcheck source=/dev/null
+  source "$TOBOGGAN_DIR/lib/$lib.sh"
+done
+
+# Run one install step with its output streamed to the screen and the log.
+# On failure: retry, read the log, open a shell (live or chroot), skip or abort.
+step() {
+  local title=$1 rc choice; shift
+  while :; do
+    log "STEP START: $title"
+    ( set -Eeuo pipefail
+      trap 'echo "\"$BASH_COMMAND\" failed (line $LINENO)" >&2' ERR
+      "$@" ) 2>&1 | tee -a "$LOG" | ui_progress "$title"
+    rc=${PIPESTATUS[0]}
+    load_state
+    if (( rc == 0 )); then log "STEP OK: $title"; return 0; fi
+    log "STEP FAILED ($rc): $title"
+    [[ $DIALOG == plain ]] && die "Step failed: $title (exit $rc). Log: $LOG"
+    while :; do
+      choice=$(ui_menu "Step failed" "\"$title\" failed (exit code $rc).\n\nThe log is at $LOG." \
+        retry  "Try this step again" \
+        log    "Read the end of the log" \
+        shell  "Shell on the live system" \
+        chroot "Shell inside the new system" \
+        skip   "Skip this step (only if you've done it by hand)" \
+        abort  "Abort the installation")
+      case $choice in
+        retry) break ;;
+        log)   tail -n 400 "$LOG" >"$RUNDIR/log-tail.txt"; ui_textbox "Log" "$RUNDIR/log-tail.txt" ;;
+        shell) clear; echo "Type 'exit' to return to the installer."; bash -i || true ;;
+        chroot)
+          if [[ -x $TARGET/bin/bash ]]; then chroot_shell
+          else ui_msg "Not available" "The new system isn't extracted yet."; fi ;;
+        skip)  log "STEP SKIPPED: $title"; return 0 ;;
+        abort) clear; die "Aborted during: $title" ;;
+      esac
+    done
+  done
+}
+
+preflight_network() {
+  [[ $DRYRUN == 1 ]] && return 0
+  # HTTPS and signature checks fail on a wrong clock, so sync it first.
+  if have chronyd; then timeout 30 chronyd -q 'pool pool.ntp.org iburst' >/dev/null 2>&1 || true; fi
+  until fetch_stdout "${G_MIRROR%/}/releases/" >/dev/null 2>&1; do
+    [[ $DIALOG == plain ]] && die "Can't reach $G_MIRROR. Check the network."
+    ui_yesno "No network" "Can't reach $G_MIRROR.\n\nSet up networking on another console (Alt+F2, then run net-setup), then choose Yes to try again. No quits." \
+      || { clear; exit 1; }
+  done
+}
+
+confirm_install() {
+  if [[ $ASSUME_YES == 1 ]]; then cat "$RUNDIR/summary.txt"; return 0; fi
+  ui_textbox "Review your choices (scroll with the arrow keys)" "$RUNDIR/summary.txt"
+  ui_yesno "Ready?" "Start the installation onto $G_DISK?" || { clear; exit 0; }
+  local typed
+  typed=$(ui_input "Final confirmation" "This ERASES EVERYTHING on $G_DISK.\n\nType $G_DISK to confirm:" "")
+  if [[ $typed != "$G_DISK" ]]; then ui_msg "Cancelled" "That didn't match, so nothing was changed."; clear; exit 1; fi
+}
+
+install_run() {
+  step "Partitioning $G_DISK"         disk_partition
+  step "Formatting"                   disk_format
+  step "Mounting filesystems"         disk_mount
+  step "Installing the stage3"        stage3_install
+  step "Writing configuration"        configure_all
+  step "Preparing the chroot"         chroot_prepare
+  cstep sync       "Syncing the Gentoo repository"
+  cstep profile    "Selecting the profile"
+  cstep cpuflags   "Detecting CPU instruction set flags"
+  cstep locale     "Generating locales"
+  cstep world      "Updating @world (can take a while)"
+  cstep base       "Installing firmware and system tools"
+  cstep bootloader "Installing the $G_BOOTLOADER bootloader"
+  kernel_install
+  if [[ -n $G_VIDEO_CARDS ]]; then cstep graphics "Installing graphics drivers"; fi
+  if [[ $G_DESKTOP != none ]]; then cstep desktop "Installing $G_DESKTOP (the longest step without binary packages)"; fi
+  cstep users      "Creating users"
+  cstep services   "Enabling services"
+  cstep finalize   "Finalising the bootloader"
+  step "Saving logs and unmounting" finish
+}
+
+main() {
+  [[ $DRYRUN == 1 || $EUID -eq 0 ]] || die "Run toboggan as root from the Gentoo live medium."
+  [[ $(uname -m) == x86_64 ]] || die "This version only supports amd64 (x86_64)."
+  rundir_init
+  log "toboggan $TOBOGGAN_VERSION starting (dry-run=$DRYRUN, target=$TARGET)"
+  ui_init
+  if [[ $DIALOG == plain && ( -z $ANSWERS_IN || $ASSUME_YES != 1 ) ]]; then
+    die "Without dialog or whiptail, run with --answers FILE --yes."
+  fi
+  hw_report
+  if [[ -n $ANSWERS_IN ]]; then config_load_answers "$ANSWERS_IN"; fi
+  config_defaults
+  preflight_network
+  if [[ -z $ANSWERS_IN ]]; then q_all; fi
+
+  local errs
+  until errs=$(validate_config); do
+    if [[ $DIALOG == plain || -n $ANSWERS_IN ]]; then die $'Invalid configuration:\n'"$errs"; fi
+    ui_msg "Please fix these" "$errs\n\nThe questions will run again with your answers as defaults."
+    q_all
+  done
+  config_derive
+  summary_text >"$RUNDIR/summary.txt"
+  confirm_install
+  install_run
+
+  if [[ $DIALOG == plain ]]; then msg "Installation complete. Log: $TARGET/var/log/toboggan"; return 0; fi
+  if ui_yesno "Done" "Gentoo is installed.\n\nThe log, hardware report and kernel config are in /var/log/toboggan on the new system.\n\nRemove the install medium and reboot now?"; then
+    run reboot
+  fi
+  clear
+}
+
+main "$@"
