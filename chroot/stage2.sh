@@ -240,6 +240,8 @@ s_users() {
     useradd -m -s /bin/bash -G "$(IFS=,; echo "${groups[*]}")" "$G_USERNAME"
   fi
   usermod -p "$(hash_secret user_pass)" "$G_USERNAME"
+  if ! command -v sudo >/dev/null; then emerge --noreplace app-admin/sudo; fi
+  mkdir -p /etc/sudoers.d
   printf '%%wheel ALL=(ALL:ALL) ALL\n' >/etc/sudoers.d/10-wheel
   chmod 0440 /etc/sudoers.d/10-wheel
   echo "Created $G_USERNAME (groups: ${groups[*]})"
