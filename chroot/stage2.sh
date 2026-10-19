@@ -65,6 +65,7 @@ display_manager() {
 s_sync() {
   mkdir -p /var/db/repos/gentoo
   emerge-webrsync
+  if [[ $G_BINPKG == yes ]] && command -v getuto >/dev/null; then getuto; fi
 }
 
 s_profile() {
@@ -112,7 +113,7 @@ s_base() {
   if [[ $G_LUKS == yes ]]; then p+=(sys-fs/cryptsetup); fi
   case $G_INITRAMFS in dracut) p+=(sys-kernel/dracut) ;; ugrd) p+=(sys-kernel/ugrd) ;; esac
   if [[ $G_BOOTMODE == uefi ]]; then p+=(sys-boot/efibootmgr); fi
-  if [[ $G_DESKTOP != none ]]; then p+=(net-misc/networkmanager); else p+=(net-misc/dhcpcd); fi
+  if [[ $G_NET == networkmanager ]]; then p+=(net-misc/networkmanager); else p+=(net-misc/dhcpcd); fi
   if [[ $G_INIT == openrc ]]; then p+=(app-admin/sysklogd sys-process/cronie net-misc/chrony); fi
   if [[ $G_SWAP == zram ]]; then
     if [[ $G_INIT == openrc ]]; then p+=(sys-block/zram-init); else p+=(sys-apps/zram-generator); fi
@@ -279,7 +280,7 @@ s_services() {
   else
     svc sysklogd; svc cronie; svc chronyd
   fi
-  if [[ $G_DESKTOP != none ]]; then svc NetworkManager; else svc dhcpcd; fi
+  if [[ $G_NET == networkmanager ]]; then svc NetworkManager; else svc dhcpcd; fi
 
   if [[ $G_DESKTOP != none && $G_INIT == openrc ]]; then svc elogind boot; svc dbus; fi
   # OpenRC user services (user.<name>, started by pam_openrc at login) need

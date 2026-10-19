@@ -184,7 +184,7 @@ q_identity() {
 
 q_all() {
   q_disk; q_filesystem; q_luks; q_swap
-  q_init; q_desktop; q_graphics
+  q_init; q_desktop; q_graphics; q_wifi
   q_kernel; q_initramfs; q_bootloader
   q_compile; q_locale; q_identity
 }

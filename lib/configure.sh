@@ -113,6 +113,9 @@ cfg_package_files() {
   if [[ $G_DESKTOP != none ]]; then
     echo 'media-video/pipewire sound-server' | wfile /etc/portage/package.use/pipewire
   fi
+  if [[ $G_NET == networkmanager && ( $G_WIFI_HW == yes || -n $G_WIFI_SSID ) ]]; then
+    echo 'net-misc/networkmanager wifi' | wfile /etc/portage/package.use/networkmanager
+  fi
   if [[ $G_KERNEL == bin ]]; then
     # Anything depending on virtual/dist-kernel would otherwise pull in the
     # compile-from-source gentoo-kernel before gentoo-kernel-bin is installed.

@@ -6,7 +6,7 @@
 # files without anything installer-related (or secret) touching the new disk.
 
 # shellcheck disable=SC2034 # used by the other libs
-TOBOGGAN_VERSION="0.2.0"
+TOBOGGAN_VERSION="0.3.0"
 TARGET=${TARGET:-/mnt/gentoo}
 RUNDIR=${RUNDIR:-/run/toboggan}
 SECRETS="$RUNDIR/secrets"

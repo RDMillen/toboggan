@@ -11,6 +11,7 @@ config_defaults() {
   : "${G_JOBS:=$(hw_default_jobs)}" "${G_MIRROR:=https://distfiles.gentoo.org}"
   : "${G_LOCALE:=en_US.UTF-8}" "${G_TIMEZONE:=UTC}" "${G_KEYMAP:=us}"
   : "${G_HOSTNAME:=gentoo}" "${G_USERNAME:=}" "${G_STAGE3_INSECURE:=no}"
+  : "${G_WIFI_SSID:=}" "${G_WIFI_KEYMGMT:=}" "${G_WIFI_HIDDEN:=no}"
   # Facts discovered during the install (state.sh)
   : "${G_BOOT_PART:=}" "${G_ROOT_PART:=}" "${G_ROOT_DEV:=}" "${G_ROOT_UUID:=}" "${G_ROOT_PARTUUID:=}"
   : "${G_BOOT_UUID:=}" "${G_LUKS_UUID:=}" "${G_SWAPFILE:=}" "${G_PROFILE_SUFFIX:=}"
@@ -26,6 +27,14 @@ config_derive() {
     answer_set G_BOOT_FS vfat; answer_set G_BOOT_MNT /efi
   else
     answer_set G_BOOT_FS vfat; answer_set G_BOOT_MNT /boot
+  fi
+  # NetworkManager whenever there's a desktop or any Wi-Fi hardware: dhcpcd
+  # alone can't join a wireless network.
+  if wifi_present; then answer_set G_WIFI_HW yes; else answer_set G_WIFI_HW no; fi
+  if [[ $G_DESKTOP != none || $G_WIFI_HW == yes || -n $G_WIFI_SSID ]]; then
+    answer_set G_NET networkmanager
+  else
+    answer_set G_NET dhcpcd
   fi
   # Persist every setting so stage 2 (inside the chroot) sees the same values.
   local v
@@ -43,10 +52,13 @@ config_load_answers() {
   source "$1"
   local pair name var
   for pair in G_ROOT_PASSWORD:root_pass G_USER_PASSWORD:user_pass \
-              G_LUKS_PASSPHRASE:luks_pass; do
+              G_LUKS_PASSPHRASE:luks_pass G_WIFI_PASSPHRASE:wifi_psk; do
     var=${pair%%:*}; name=${pair#*:}
     if [[ -n ${!var:-} ]]; then secret_set "$name" "${!var}"; unset "$var"; fi
   done
+  if [[ -n ${G_WIFI_SSID:-} && -z ${G_WIFI_KEYMGMT:-} ]]; then
+    if [[ -s $(secret_path wifi_psk) ]]; then G_WIFI_KEYMGMT=psk; else G_WIFI_KEYMGMT=none; fi
+  fi
 }
 
 # Time zone names are checked for shape only here. The live medium's own
@@ -87,6 +99,10 @@ validate_config() {
   valid_tz "$G_TIMEZONE" || e+=("Time zone should look like Europe/London or UTC.")
   [[ $G_HOSTNAME =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,62}$ ]] || e+=("Hostname may only contain letters, digits and hyphens.")
   [[ $G_USERNAME =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || e+=("Username must be lowercase letters, digits, - or _.")
+  if [[ -n $G_WIFI_SSID ]]; then
+    _in "$G_WIFI_KEYMGMT" none psk sae || e+=("G_WIFI_KEYMGMT must be none, psk or sae.")
+    if [[ $G_WIFI_KEYMGMT != none && ! -s $(secret_path wifi_psk) ]]; then e+=("No Wi-Fi password for \"$G_WIFI_SSID\"."); fi
+  fi
   [[ -s $(secret_path root_pass) ]] || e+=("No root password set.")
   [[ -s $(secret_path user_pass) ]] || e+=("No password set for $G_USERNAME.")
   if [[ $G_LUKS == yes && ! -s $(secret_path luks_pass) ]]; then e+=("No LUKS passphrase set."); fi
@@ -119,6 +135,7 @@ Compiler:      -march=$G_MARCH -O2 -pipe, $G_JOBS parallel jobs
 Packages:      $( [[ $G_BINPKG == yes ]] && echo "binary packages where they match, the rest compiled" || echo "all compiled from source" )
 Mirror:        $G_MIRROR
 Locale:        $G_LOCALE, time zone $G_TIMEZONE, keymap $G_KEYMAP
+Network:       $( [[ $G_NET == networkmanager ]] && echo NetworkManager || echo dhcpcd )$( [[ -n $G_WIFI_SSID ]] && echo ", Wi-Fi \"$G_WIFI_SSID\" copied from this machine" )
 Hostname:      $G_HOSTNAME
 User:          $G_USERNAME (member of wheel, can use sudo)
 EOF

@@ -37,7 +37,7 @@ else
 fi
 
 TOBOGGAN_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
-for lib in common ui hw config questions disk stage3 configure kconfig chroot kernel; do
+for lib in common ui hw config questions wifi disk stage3 configure kconfig chroot kernel; do
   # shellcheck source=/dev/null
   source "$TOBOGGAN_DIR/lib/$lib.sh"
 done
@@ -123,6 +123,7 @@ install_run() {
   cstep users      "Creating users"
   cstep services   "Enabling services"
   cstep finalize   "Finalising the bootloader"
+  if [[ -n $G_WIFI_SSID ]]; then step "Saving the Wi-Fi connection \"$G_WIFI_SSID\"" wifi_install; fi
   step "Saving logs and unmounting" finish
 }
 
