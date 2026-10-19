@@ -75,7 +75,7 @@ q_init() {
 }
 
 q_desktop() {
-  answer_set G_DESKTOP "$(ui_radio "Desktop" "Desktop environment or window manager.\n\nWithout binary packages, Plasma and GNOME take many hours to compile." \
+  answer_set G_DESKTOP "$(ui_radio "Desktop" "Desktop environment or window manager.\n\nCompiled from source, Plasma and GNOME can take many hours (binary packages are offered later)." \
     none     "Console only"                       "$(_on none "$G_DESKTOP")" \
     plasma   "KDE Plasma (SDDM)"                  "$(_on plasma "$G_DESKTOP")" \
     gnome    "GNOME (GDM)"                        "$(_on gnome "$G_DESKTOP")" \
@@ -104,7 +104,7 @@ q_graphics() {
 }
 
 q_kernel() {
-  answer_set G_KERNEL "$(ui_radio "Kernel" "Which kernel?" \
+  answer_set G_KERNEL "$(ui_radio "Kernel" "Which kernel? (How the rest of the system is installed is asked separately.)" \
     bin     "gentoo-kernel-bin: prebuilt, ready in minutes"                   "$(_on bin "$G_KERNEL")" \
     sources "gentoo-sources: configure it yourself in make menuconfig"        "$(_on sources "$G_KERNEL")")"
   if [[ $G_KERNEL == sources ]]; then
@@ -138,11 +138,9 @@ q_compile() {
     native    "This CPU exactly (fastest; binaries may not run elsewhere)" "$(_on native "$G_MARCH")" \
     x86-64-v3 "Haswell / Zen and newer"                                     "$(_on x86-64-v3 "$G_MARCH")" \
     x86-64    "Any 64-bit x86 CPU"                                          "$(_on x86-64 "$G_MARCH")")"
-  if ui_yesno "Binary packages" "Use Gentoo's official binary package host where a matching package exists?\n\nThis cuts install time from hours to minutes. Packages are signature-checked, and anything that doesn't match your USE flags is still compiled locally."; then
-    answer_set G_BINPKG yes
-  else
-    answer_set G_BINPKG no
-  fi
+  answer_set G_BINPKG "$(ui_radio "Packages" "How should packages (everything except the kernel, which you chose earlier) be installed?\n\nBinary packages come from Gentoo's signed binary host and cut install time from hours to minutes, but they're built for generic x86-64, not your -march setting. Anything that doesn't match your USE flags is still compiled." \
+    no  "Compile everything from source"            "$(_on no "$G_BINPKG")" \
+    yes "Use binary packages where they match"      "$(_on yes "$G_BINPKG")")"
   answer_set G_JOBS "$(q_number "Parallel jobs" "MAKEOPTS jobs (suggested: one per CPU, at most one per 2 GiB RAM):" "$G_JOBS" 1 512)"
   answer_set G_MIRROR "$(ui_input "Mirror" "Gentoo mirror for the stage3 and source files:" "$G_MIRROR")"
 }

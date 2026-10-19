@@ -7,7 +7,7 @@ config_defaults() {
   : "${G_DISK:=}" "${G_BOOTMODE:=$(hw_boot_mode)}" "${G_FS:=ext4}" "${G_LUKS:=no}"
   : "${G_SWAP:=zram}" "${G_SWAP_SIZE:=4}" "${G_INIT:=openrc}" "${G_DESKTOP:=none}"
   : "${G_VIDEO_CARDS:=}" "${G_KERNEL:=bin}" "${G_KCONFIG_BASE:=localmod}"
-  : "${G_INITRAMFS:=dracut}" "${G_BOOTLOADER:=grub}" "${G_MARCH:=native}" "${G_BINPKG:=yes}"
+  : "${G_INITRAMFS:=dracut}" "${G_BOOTLOADER:=grub}" "${G_MARCH:=native}" "${G_BINPKG:=no}"
   : "${G_JOBS:=$(hw_default_jobs)}" "${G_MIRROR:=https://distfiles.gentoo.org}"
   : "${G_LOCALE:=en_US.UTF-8}" "${G_TIMEZONE:=UTC}" "${G_KEYMAP:=us}"
   : "${G_HOSTNAME:=gentoo}" "${G_USERNAME:=}" "${G_STAGE3_INSECURE:=no}"
@@ -116,7 +116,7 @@ Kernel:        $kern
 Initramfs:     $G_INITRAMFS
 Bootloader:    $G_BOOTLOADER
 Compiler:      -march=$G_MARCH -O2 -pipe, $G_JOBS parallel jobs
-Binary pkgs:   $G_BINPKG
+Packages:      $( [[ $G_BINPKG == yes ]] && echo "binary packages where they match, the rest compiled" || echo "all compiled from source" )
 Mirror:        $G_MIRROR
 Locale:        $G_LOCALE, time zone $G_TIMEZONE, keymap $G_KEYMAP
 Hostname:      $G_HOSTNAME
