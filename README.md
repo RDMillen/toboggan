@@ -39,6 +39,10 @@ cd toboggan
 ./toboggan
 ```
 
+## Known Issues
+
+* Currently, USE flag requirement are not automatically satisfied. The Console/Basic install works, however some desktop environment options require additional flags of which I am currently working on a method of adding missing flags, then re-running the previous failed emerge.
+
 ## Issues and PRs 
 
 Please report issues or subimt PRs at your leisure. 
