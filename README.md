@@ -29,7 +29,9 @@ For those who may stumble upon this page and see it as a quick way to land on a 
 * Undo an accidental `sudo rm -rf /`
 * Solve world hunger
 
-## Install
+## Install & Run
+
+From your installation environment, or minimal install ISO, bring up the network (wired or Wi-Fi). 
 
 Clone from Github and run:
 
