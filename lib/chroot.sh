@@ -19,7 +19,7 @@ chroot_prepare() {
   run mount --make-slave "$TARGET/run"
   # Stage-2 scripts live in /run/toboggan/bin, visible inside the chroot via /run.
   mkdir -p "$RUNDIR/bin"
-  cp "$TOBOGGAN_DIR/chroot/stage2.sh" "$RUNDIR/bin/"
+  cp "$TOBOGGAN_DIR/chroot/stage2.sh" "$TOBOGGAN_DIR/chroot/use-fix.py" "$RUNDIR/bin/"
   chmod 755 "$RUNDIR/bin/"*
   echo "Chroot ready."
 }

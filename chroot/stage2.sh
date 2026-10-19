@@ -19,6 +19,30 @@ source "$R/answers.sh"
 source "$R/state.sh"
 
 has_word() { [[ " $2 " == *" $1 "* ]]; }
+
+# emerge that recovers from missing USE flags. If emerge fails and says a
+# package needs a flag (a USE dependency, or a simple REQUIRED_USE), the flag
+# is added package-wide to AUTOUSE_FILE and the same command runs again.
+# Only USE flags are touched: no ~amd64 keywords, unmasking or licences.
+AUTOUSE_FILE=/etc/portage/package.use/zz-toboggan-auto
+em() {
+  local out=/var/tmp/toboggan-emerge.out rc attempt
+  for attempt in 1 2 3 4 5 6 7 8; do
+    rc=0
+    emerge --autounmask=y --autounmask-keep-keywords=y --autounmask-keep-masks=y \
+      --autounmask-write=n "$@" 2>&1 | tee "$out" || rc=${PIPESTATUS[0]}
+    (( rc == 0 )) && return 0
+    echo ">>> emerge failed (exit $rc). Checking whether it needs USE flag changes..."
+    if python3 "$R/bin/use-fix.py" "$out" "$AUTOUSE_FILE"; then
+      echo ">>> Added to $AUTOUSE_FILE. Running the same command again (attempt $((attempt + 1)))."
+      continue
+    fi
+    echo ">>> No USE flag fix found; this needs a person to look at it."
+    return "$rc"
+  done
+  echo ">>> Still failing after repeated USE flag changes; stopping."
+  return 1
+}
 hash_secret() { openssl passwd -6 -stdin <"$R/secrets/$1"; }
 
 svc() { # service [runlevel]
@@ -41,7 +65,6 @@ display_manager() {
 s_sync() {
   mkdir -p /var/db/repos/gentoo
   emerge-webrsync
-  if [[ $G_BINPKG == yes ]] && command -v getuto >/dev/null; then getuto; fi
 }
 
 s_profile() {
@@ -58,7 +81,7 @@ s_profile() {
 }
 
 s_cpuflags() {
-  emerge --oneshot --noreplace app-portage/cpuid2cpuflags
+  em --oneshot --noreplace app-portage/cpuid2cpuflags
   echo "*/* $(cpuid2cpuflags)" >/etc/portage/package.use/00cpu-flags
   cat /etc/portage/package.use/00cpu-flags
 }
@@ -78,7 +101,7 @@ s_locale() {
 }
 
 s_world() {
-  emerge --update --deep --newuse @world
+  em --update --deep --newuse @world
 }
 
 s_base() {
@@ -94,13 +117,13 @@ s_base() {
   if [[ $G_SWAP == zram ]]; then
     if [[ $G_INIT == openrc ]]; then p+=(sys-block/zram-init); else p+=(sys-apps/zram-generator); fi
   fi
-  emerge --noreplace "${p[@]}"
+  em --noreplace "${p[@]}"
 }
 
 s_bootloader() {
   case $G_BOOTLOADER in
     grub)
-      emerge --noreplace sys-boot/grub
+      em --noreplace sys-boot/grub
       if ! grep -q '^# Added by toboggan' /etc/default/grub; then
         {
           echo
@@ -132,12 +155,12 @@ s_bootloader() {
 
 s_kernel_package() {
   case $G_KERNEL in
-    bin) emerge --noreplace sys-kernel/gentoo-kernel-bin ;;
+    bin) em --noreplace sys-kernel/gentoo-kernel-bin ;;
   esac
 }
 
 s_kernel_prepare() {
-  emerge --noreplace sys-kernel/gentoo-sources
+  em --noreplace sys-kernel/gentoo-sources
   eselect kernel set 1
   cd /usr/src/linux
   if [[ $G_KCONFIG_BASE == localmod && -r $R/hw/config-live.gz ]]; then
@@ -209,7 +232,7 @@ s_kernel_build() {
 }
 
 s_graphics() {
-  if has_word nvidia "$G_VIDEO_CARDS"; then emerge --noreplace x11-drivers/nvidia-drivers; fi
+  if has_word nvidia "$G_VIDEO_CARDS"; then em --noreplace x11-drivers/nvidia-drivers; fi
   return 0
 }
 
@@ -227,7 +250,7 @@ s_desktop() {
   p+=(media-video/pipewire media-video/wireplumber media-fonts/noto)
   dm=$(display_manager)
   if [[ $G_INIT == openrc && -n $dm ]]; then p+=(gui-libs/display-manager-init); fi
-  emerge --noreplace "${p[@]}"
+  em --noreplace "${p[@]}"
 }
 
 s_users() {
@@ -240,7 +263,7 @@ s_users() {
     useradd -m -s /bin/bash -G "$(IFS=,; echo "${groups[*]}")" "$G_USERNAME"
   fi
   usermod -p "$(hash_secret user_pass)" "$G_USERNAME"
-  if ! command -v sudo >/dev/null; then emerge --noreplace app-admin/sudo; fi
+  if ! command -v sudo >/dev/null; then em --noreplace app-admin/sudo; fi
   mkdir -p /etc/sudoers.d
   printf '%%wheel ALL=(ALL:ALL) ALL\n' >/etc/sudoers.d/10-wheel
   chmod 0440 /etc/sudoers.d/10-wheel
@@ -259,6 +282,12 @@ s_services() {
   if [[ $G_DESKTOP != none ]]; then svc NetworkManager; else svc dhcpcd; fi
 
   if [[ $G_DESKTOP != none && $G_INIT == openrc ]]; then svc elogind boot; svc dbus; fi
+  # OpenRC user services (user.<name>, started by pam_openrc at login) need
+  # XDG_RUNTIME_DIR, which elogind provides. Console-only installs have no
+  # elogind, so turn the autostart off rather than fail at every login.
+  if [[ $G_DESKTOP == none && $G_INIT == openrc ]] && ! grep -q '^rc_autostart_user=' /etc/rc.conf; then
+    printf '\n# Set by toboggan: no elogind, so no XDG_RUNTIME_DIR for user services.\nrc_autostart_user="NO"\n' >>/etc/rc.conf
+  fi
   dm=$(display_manager)
   if [[ -n $dm ]]; then
     if [[ $G_INIT == openrc ]]; then
@@ -293,6 +322,10 @@ EOF
 
 s_finalize() {
   if [[ $G_BOOTLOADER == grub ]]; then grub-mkconfig -o /boot/grub/grub.cfg; fi
+  if [[ -s $AUTOUSE_FILE ]]; then
+    echo "USE flags added automatically during the install ($AUTOUSE_FILE):"
+    grep -v '^#' "$AUTOUSE_FILE" | sed '/^$/d; s/^/  /'
+  fi
   echo "Kernels and boot files:"
   find /boot "$G_BOOT_MNT" -maxdepth 5 -type f \
     \( -name 'vmlinuz*' -o -name 'kernel-*' -o -name 'linux' -o -name 'initr*' -o -name '*.efi' -o -name 'grub.cfg' \) \
