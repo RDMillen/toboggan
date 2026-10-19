@@ -47,7 +47,7 @@ cd toboggan
 
 ## Issues and PRs 
 
-Please report issues or subimt PRs at your leisure. 
+Please report issues or submit PRs at your leisure. 
 
 ## License
 
