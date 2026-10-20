@@ -1,6 +1,22 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
+"""Read a failed emerge's output and apply the USE flags it asked for.
 
+Handles the two ways Portage reports a missing USE flag:
+
+1. "The following USE changes are necessary to proceed:" followed by lines
+   like `>=x11-libs/libxfce4ui-4.20.0 gtk3` (a dependency needs a flag).
+2. "The following REQUIRED_USE flag constraints are unsatisfied:" for a
+   package whose own flags conflict. Only plain single-flag constraints such
+   as `gtk3` or `!qt5` are applied; any-of / exactly-one-of choices are left
+   for a person to decide.
+
+Flags are written package-wide (`x11-libs/libxfce4ui gtk3`), never pinned to
+a version, and merged into one line per package in the given package.use file.
+
+Usage: use-fix.py EMERGE_OUTPUT PACKAGE_USE_FILE
+Exit 0 if new flags were written, 1 if there was nothing (new) to apply.
+"""
 import re
 import sys
 from pathlib import Path

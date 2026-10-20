@@ -28,7 +28,7 @@ kernel_menuconfig() {
     else
       text="All the options needed to boot are still set."
     fi
-    choice=$(ui_menu "Kernel config" "$text" \
+    choice=$(UI_CANCEL="" ui_menu "Kernel config" "$text" \
       build  "Build the kernel with this config" \
       edit   "Back to make menuconfig" \
       reset  "Restore the required options, then back to menuconfig" \

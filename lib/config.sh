@@ -96,6 +96,10 @@ validate_config() {
   if has_word nvidia "$G_VIDEO_CARDS" && has_word nouveau "$G_VIDEO_CARDS"; then
     e+=("Choose either the proprietary NVIDIA driver or nouveau, not both."); fi
   [[ $G_LOCALE =~ ^[a-z]{2,3}_[A-Z]{2}\.UTF-8$ ]] || e+=("Locale should look like en_GB.UTF-8.")
+  if [[ -r $TOBOGGAN_DIR/data/locales.txt ]] && ! grep -q "^${G_LOCALE//./\\.}|" "$TOBOGGAN_DIR/data/locales.txt"; then
+    e+=("$G_LOCALE isn't a supported locale (see data/locales.txt)."); fi
+  if [[ -r $TOBOGGAN_DIR/data/keymaps.txt ]] && ! grep -q "^${G_KEYMAP}|" "$TOBOGGAN_DIR/data/keymaps.txt"; then
+    e+=("Unknown keymap: $G_KEYMAP (see data/keymaps.txt)."); fi
   valid_tz "$G_TIMEZONE" || e+=("Time zone should look like Europe/London or UTC.")
   [[ $G_HOSTNAME =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,62}$ ]] || e+=("Hostname may only contain letters, digits and hyphens.")
   [[ $G_USERNAME =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || e+=("Username must be lowercase letters, digits, - or _.")

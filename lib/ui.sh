@@ -34,15 +34,29 @@ ui_confirm_quit() {
   fi
 }
 
-# Run a dialog that returns a value; Cancel/Esc asks whether to quit.
+# The Cancel button's label. Questions use "Back" (which returns to the main
+# menu); set UI_CANCEL=Quit for the main menu, or UI_CANCEL="" for no button.
+UI_CANCEL=${UI_CANCEL-Back}
+
+_ui_cancel_opts() {
+  if [[ -z $UI_CANCEL ]]; then
+    if [[ $DIALOG == dialog ]]; then echo --no-cancel; else echo --nocancel; fi
+  elif [[ $DIALOG == dialog ]]; then
+    printf '%s\n' --cancel-label "$UI_CANCEL"
+  else
+    printf '%s\n' --cancel-button "$UI_CANCEL"
+  fi
+}
+
+# Run a dialog that returns a value. Returns 1 on Back/Cancel/Esc, so callers
+# write: v=$(ui_radio ...) || return 1
 _ui() {
   _ui_needs_tty
-  local out rc
-  while :; do
-    out=$("$DIALOG" --backtitle "$BACKTITLE" "$@" 3>&1 1>&2 2>&3); rc=$?
-    if (( rc == 0 )); then printf '%s' "$out"; return 0; fi
-    ui_confirm_quit
-  done
+  local out rc opts
+  mapfile -t opts < <(_ui_cancel_opts)
+  out=$("$DIALOG" --backtitle "$BACKTITLE" "${opts[@]}" "$@" 3>&1 1>&2 2>&3); rc=$?
+  if (( rc == 0 )); then printf '%s' "$out"; return 0; fi
+  return 1
 }
 
 ui_msg() {
@@ -50,13 +64,14 @@ ui_msg() {
   "$DIALOG" --backtitle "$BACKTITLE" --title "$1" --msgbox "$2" "$UI_H" "$UI_W"
 }
 
-# Returns 0 for Yes. In plain mode, Yes only with --yes.
+# Returns 0 for Yes, 1 for No, 255 for Esc. In plain mode, Yes only with --yes.
 ui_yesno() {
   if [[ $DIALOG == plain ]]; then [[ $ASSUME_YES == 1 ]]; return; fi
   "$DIALOG" --backtitle "$BACKTITLE" --title "$1" --yesno "$2" "$UI_H" "$UI_W"
 }
 
-# Two-button question with custom labels; long text scrolls. 0 = first button.
+# Two-button question with custom labels; long text scrolls.
+# Returns 0 for the first button, 1 for the second, 255 for Esc.
 ui_choice() { # title text yes-label no-label
   if [[ $DIALOG == plain ]]; then printf '\n[%s]\n%b\n' "$1" "$2"; [[ $ASSUME_YES == 1 ]]; return; fi
   if [[ $DIALOG == dialog ]]; then
@@ -71,6 +86,12 @@ ui_choice() { # title text yes-label no-label
 ui_input()    { _ui --title "$1" --inputbox "$2" "$UI_H" "$UI_W" "${3:-}"; }
 ui_password() { _ui --title "$1" --insecure --passwordbox "$2" "$UI_H" "$UI_W"; }
 ui_menu()     { _ui --title "$1" --menu "$2" "$UI_H" "$UI_W" $((UI_H - 9)) "${@:3}"; }
+# Menu with the current value preselected: ui_pick title text current tag item...
+ui_pick() {
+  local def=()
+  [[ -n $3 ]] && def=(--default-item "$3")
+  _ui --title "$1" "${def[@]}" --menu "$2" "$UI_H" "$UI_W" $((UI_H - 9)) "${@:4}"
+}
 ui_radio()    { _ui --title "$1" --radiolist "$2" "$UI_H" "$UI_W" $((UI_H - 9)) "${@:3}"; }
 ui_check()    { _ui --title "$1" --separate-output --checklist "$2" "$UI_H" "$UI_W" $((UI_H - 9)) "${@:3}"; }
 

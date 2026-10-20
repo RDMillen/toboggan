@@ -35,10 +35,20 @@ wifi_ssid() {
 
 # Interactive: offer to copy the active connection. Sets G_WIFI_SSID,
 # G_WIFI_KEYMGMT (none|psk|sae), G_WIFI_HIDDEN and the wifi_psk secret.
+# Returns 1 on Back. With "menu" as $1 (chosen from the main menu) it explains
+# why there's nothing to copy instead of silently moving on.
 q_wifi() {
-  answer_set G_WIFI_SSID ""
-  local iface ssid WIFI_SOURCE="" WIFI_KEYMGMT="" WIFI_HIDDEN=no creds="" p
-  iface=$(wifi_active_iface) || return 0
+  local from=${1:-} iface ssid WIFI_SOURCE="" WIFI_KEYMGMT="" WIFI_HIDDEN=no creds="" p rc
+  if ! iface=$(wifi_active_iface); then
+    if [[ $from == menu ]]; then
+      if wifi_present; then
+        ui_msg "Wi-Fi" "This machine has Wi-Fi but isn't using it right now, so there's no connection to copy. NetworkManager will be installed: connect after the first boot with nmtui."
+      else
+        ui_msg "Wi-Fi" "No Wi-Fi hardware was found, so there's nothing to set up."
+      fi
+    fi
+    return 0
+  fi
   ssid=$(wifi_ssid "$iface") || true
   if [[ -z $ssid ]]; then
     ui_msg "Wi-Fi" "You're on Wi-Fi ($iface), but toboggan couldn't tell which network, so it can't be copied. NetworkManager will be installed: connect after the first boot with nmtui."
@@ -50,14 +60,21 @@ q_wifi() {
   case $WIFI_KEYMGMT in
     eap)
       ui_msg "Wi-Fi" "\"$ssid\" uses enterprise (802.1X) sign-in, which toboggan can't copy. NetworkManager will be installed: set it up after the first boot with nmtui."
+      answer_set G_WIFI_SSID ""
       return 0 ;;
     none|psk|sae)
-      ui_yesno "Wi-Fi" "This machine is connected to the Wi-Fi network \"$ssid\".\n\nCopy this connection to the new system so it connects automatically on first boot?\n\nThe password (found in $WIFI_SOURCE's settings) will be saved in a file only root can read: /etc/NetworkManager/system-connections/." || return 0 ;;
+      ui_choice "Wi-Fi" "This machine is connected to the Wi-Fi network \"$ssid\".\n\nCopy this connection to the new system so it connects automatically on first boot?\n\nThe password (found in $WIFI_SOURCE's settings) will be saved in a file only root can read: /etc/NetworkManager/system-connections/." \
+        "Copy" "Don't copy"; rc=$? ;;
     *)
-      ui_yesno "Wi-Fi" "This machine is connected to the Wi-Fi network \"$ssid\", but its password couldn't be found on the live system.\n\nEnter the password now so the new system connects automatically on first boot?" || return 0
-      p=$(ui_password "Wi-Fi password" "Password for \"$ssid\" (leave empty for an open network):")
-      if [[ -n $p ]]; then secret_set wifi_psk "$p"; WIFI_KEYMGMT=psk; else WIFI_KEYMGMT=none; fi ;;
+      ui_choice "Wi-Fi" "This machine is connected to the Wi-Fi network \"$ssid\", but its password couldn't be found on the live system.\n\nEnter the password now so the new system connects automatically on first boot?" \
+        "Enter password" "Don't copy"; rc=$?
+      if (( rc == 0 )); then
+        p=$(ui_password "Wi-Fi password" "Password for \"$ssid\" (leave empty for an open network):") || return 1
+        if [[ -n $p ]]; then secret_set wifi_psk "$p"; WIFI_KEYMGMT=psk; else WIFI_KEYMGMT=none; fi
+      fi ;;
   esac
+  (( rc == 255 )) && return 1
+  if (( rc != 0 )); then answer_set G_WIFI_SSID ""; return 0; fi
   answer_set G_WIFI_SSID "$ssid"
   answer_set G_WIFI_KEYMGMT "$WIFI_KEYMGMT"
   answer_set G_WIFI_HIDDEN "$WIFI_HIDDEN"

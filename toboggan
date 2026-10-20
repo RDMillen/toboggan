@@ -37,7 +37,7 @@ else
 fi
 
 TOBOGGAN_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
-for lib in common ui hw config questions wifi disk stage3 configure kconfig chroot kernel; do
+for lib in common ui hw config questions wifi menu disk stage3 configure kconfig chroot kernel; do
   # shellcheck source=/dev/null
   source "$TOBOGGAN_DIR/lib/$lib.sh"
 done
@@ -57,7 +57,7 @@ step() {
     log "STEP FAILED ($rc): $title"
     [[ $DIALOG == plain ]] && die "Step failed: $title (exit $rc). Log: $LOG"
     while :; do
-      choice=$(ui_menu "Step failed" "\"$title\" failed (exit code $rc).\n\nThe log is at $LOG." \
+      choice=$(UI_CANCEL="" ui_menu "Step failed" "\"$title\" failed (exit code $rc).\n\nThe log is at $LOG." \
         retry  "Try this step again" \
         log    "Read the end of the log" \
         shell  "Shell on the live system" \
@@ -93,12 +93,12 @@ preflight_network() {
 confirm_install() {
   if [[ $ASSUME_YES == 1 ]]; then cat "$RUNDIR/summary.txt"; return 0; fi
   ui_choice "Review your choices" \
-    "$(cat "$RUNDIR/summary.txt")\n\nConfirm to continue, or go Back to change your answers." \
+    "$(cat "$RUNDIR/summary.txt")\n\nConfirm to continue, or go Back to the main menu to change something." \
     "Confirm" "Back" || return 1
   local typed
   typed=$(ui_input "Final confirmation" "This ERASES EVERYTHING on $G_DISK.\n\nType $G_DISK to start the installation:" "")
   if [[ $typed != "$G_DISK" ]]; then
-    ui_msg "Not confirmed" "That didn't match $G_DISK, so nothing has been changed. Taking you back to your answers."
+    ui_msg "Not confirmed" "That didn't match $G_DISK, so nothing has been changed. Taking you back to the main menu."
     return 1
   fi
 }
@@ -140,21 +140,21 @@ main() {
   if [[ -n $ANSWERS_IN ]]; then config_load_answers "$ANSWERS_IN"; fi
   config_defaults
   preflight_network
-  if [[ -z $ANSWERS_IN ]]; then q_welcome; q_all; fi
-
   local errs
-  while :; do
-    until errs=$(validate_config); do
-      if [[ $DIALOG == plain || -n $ANSWERS_IN ]]; then die $'Invalid configuration:\n'"$errs"; fi
-      ui_msg "Please fix these" "$errs\n\nThe questions will run again with your answers as defaults."
-      q_all
-    done
+  if [[ -n $ANSWERS_IN && $ASSUME_YES == 1 ]]; then
+    # Unattended: the answers file must be complete and valid.
+    errs=$(validate_config) || die $'Invalid configuration:\n'"$errs"
     config_derive
     summary_text >"$RUNDIR/summary.txt"
-    confirm_install && break
-    # Back: the questions again, with the current answers as defaults.
-    q_all
-  done
+    confirm_install
+  elif [[ -n $ANSWERS_IN ]]; then
+    # Answers file, reviewed interactively: open the main menu on its values.
+    menu_mark_all_answered
+    menu_review || menu_main
+  else
+    q_welcome
+    menu_wizard
+  fi
   install_run
 
   if [[ $DIALOG == plain ]]; then msg "Installation complete. Log: $TARGET/var/log/toboggan"; return 0; fi

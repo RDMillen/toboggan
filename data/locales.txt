@@ -1,0 +1,313 @@
+# name|description (glibc SUPPORTED, UTF-8 only)
+aa_DJ.UTF-8|Afar Djibouti (Cadu//Laaqo Dialects)
+aa_ER.UTF-8|Afar Eritrea (Cadu//Laaqo Dialects)
+aa_ET.UTF-8|Afar Ethiopia (Cadu//Carra Dialects)
+af_ZA.UTF-8|Afrikaans South Africa
+agr_PE.UTF-8|Awajún (agr) Peru
+ak_GH.UTF-8|Akan Ghana
+am_ET.UTF-8|Amharic Ethiopia
+an_ES.UTF-8|Aragonese Spain
+anp_IN.UTF-8|Angika India
+ar_AE.UTF-8|Arabic United Arab Emirates
+ar_BH.UTF-8|Arabic Bahrain
+ar_DZ.UTF-8|Arabic Algeria
+ar_EG.UTF-8|Arabic Egypt
+ar_IN.UTF-8|Arabic India
+ar_IQ.UTF-8|Arabic Iraq
+ar_JO.UTF-8|Arabic Jordan
+ar_KW.UTF-8|Arabic Kuwait
+ar_LB.UTF-8|Arabic Lebanon
+ar_LY.UTF-8|Arabic Libyan Arab Jamahiriya
+ar_MA.UTF-8|Arabic Morocco
+ar_OM.UTF-8|Arabic Oman
+ar_QA.UTF-8|Arabic Qatar
+ar_SA.UTF-8|Arabic Saudi Arabia
+ar_SD.UTF-8|Arabic Sudan
+ar_SS.UTF-8|Arabic South Sudan
+ar_SY.UTF-8|Arabic Syrian Arab Republic
+ar_TN.UTF-8|Arabic Tunisia
+ar_YE.UTF-8|Arabic Yemen
+as_IN.UTF-8|Assamese India
+ast_ES.UTF-8|Asturian Spain
+ayc_PE.UTF-8|Aymara (ayc) Peru
+az_AZ.UTF-8|Azeri Azerbaijan (latin)
+az_IR.UTF-8|South Azerbaijani Iran
+be_BY.UTF-8|Belarusian Belarus
+bem_ZM.UTF-8|Bemba Zambia
+ber_DZ.UTF-8|Berber Algeria (latin)
+ber_MA.UTF-8|Berber Morocco (tifinagh)
+bg_BG.UTF-8|Bulgarian Bulgaria
+bhb_IN.UTF-8|Bhili(devanagari) India
+bho_IN.UTF-8|Bhojpuri India
+bho_NP.UTF-8|Bhojpuri Nepal
+bi_VU.UTF-8|Bislama Vanuatu
+bn_BD.UTF-8|Bangla Bangladesh
+bn_IN.UTF-8|Bangla India
+bo_CN.UTF-8|Tibetan P.R. of China
+bo_IN.UTF-8|Tibetan India
+br_FR.UTF-8|Breton France
+brx_IN.UTF-8|Bodo India
+bs_BA.UTF-8|Bosnian Bosnia and Herzegowina
+byn_ER.UTF-8|Blin Eritrea
+ca_AD.UTF-8|Catalan Andorra
+ca_ES.UTF-8|Catalan Spain
+ca_FR.UTF-8|Catalan France
+ca_IT.UTF-8|Catalan Italy (L'Alguer)
+ce_RU.UTF-8|Chechen RUSSIAN FEDERATION
+chr_US.UTF-8|Cherokee United States
+ckb_IQ.UTF-8|Central Kurdish Iraq
+cmn_TW.UTF-8|Mandarin Chinese the Republic of China
+crh_RU.UTF-8|Crimean Tatar Russia
+crh_UA.UTF-8|Crimean Tatar (Crimean Turkish) Ukraine
+cs_CZ.UTF-8|Czech the Czech Republic
+csb_PL.UTF-8|Kashubian Poland
+cv_RU.UTF-8|Chuvash Russia
+cy_GB.UTF-8|Welsh Great Britain
+da_DK.UTF-8|Danish Denmark
+de_AT.UTF-8|German Austria
+de_BE.UTF-8|German Belgium
+de_CH.UTF-8|German Switzerland
+de_DE.UTF-8|German Germany
+de_IT.UTF-8|German Italy
+de_LI.UTF-8|German Liechtenstein
+de_LU.UTF-8|German Luxemburg
+doi_IN.UTF-8|Dogri India
+dsb_DE.UTF-8|Lower Sorbian Germany
+dv_MV.UTF-8|Dhivehi Language Locale for Maldives
+dz_BT.UTF-8|Dzongkha Bhutan
+el_CY.UTF-8|Greek Cyprus
+el_GR.UTF-8|Greek Greece
+en_AG.UTF-8|English Antigua and Barbuda
+en_AU.UTF-8|English Australia
+en_BW.UTF-8|English Botswana
+en_CA.UTF-8|English Canada
+en_DK.UTF-8|English Denmark
+en_GB.UTF-8|English Britain
+en_HK.UTF-8|English Hong Kong
+en_IE.UTF-8|English Ireland
+en_IL.UTF-8|English Israel
+en_IN.UTF-8|English India
+en_NG.UTF-8|English Nigeria
+en_NZ.UTF-8|English New Zealand
+en_PH.UTF-8|English Philippines
+en_SC.UTF-8|English the Seychelles
+en_SG.UTF-8|English Singapore
+en_US.UTF-8|English the USA
+en_ZA.UTF-8|English South Africa
+en_ZM.UTF-8|English Zambia
+en_ZW.UTF-8|English Zimbabwe
+eo_US.UTF-8|Esperanto the USA
+es_AR.UTF-8|Spanish Argentina
+es_BO.UTF-8|Spanish Bolivia
+es_CL.UTF-8|Spanish Chile
+es_CO.UTF-8|Spanish Colombia
+es_CR.UTF-8|Spanish Costa Rica
+es_CU.UTF-8|Spanish Cuba
+es_DO.UTF-8|Spanish Dominican Republic
+es_EC.UTF-8|Spanish Ecuador
+es_ES.UTF-8|Spanish Spain
+es_GT.UTF-8|Spanish Guatemala
+es_HN.UTF-8|Spanish Honduras
+es_MX.UTF-8|Spanish Mexico
+es_NI.UTF-8|Spanish Nicaragua
+es_PA.UTF-8|Spanish Panama
+es_PE.UTF-8|Spanish Peru
+es_PR.UTF-8|Spanish Puerto Rico
+es_PY.UTF-8|Spanish Paraguay
+es_SV.UTF-8|Spanish El Salvador
+es_US.UTF-8|Spanish the USA
+es_UY.UTF-8|Spanish Uruguay
+es_VE.UTF-8|Spanish Venezuela
+et_EE.UTF-8|Estonian Estonia
+eu_ES.UTF-8|Basque Spain
+eu_FR.UTF-8|Basque France
+fa_IR.UTF-8|Persian Iran
+ff_SN.UTF-8|Fulah Senegal
+fi_FI.UTF-8|Finnish Finland
+fil_PH.UTF-8|Filipino Philippines
+fo_FO.UTF-8|Faroese Faroe Islands
+fr_BE.UTF-8|French Belgium
+fr_CA.UTF-8|French Canada
+fr_CH.UTF-8|French Switzerland
+fr_FR.UTF-8|French France
+fr_LU.UTF-8|French Luxemburg
+fur_IT.UTF-8|Furlan Italy
+fy_DE.UTF-8|Western Frisian Germany
+fy_NL.UTF-8|Frisian the Netherlands
+ga_IE.UTF-8|Irish Ireland
+gbm_IN.UTF-8|Garhwali India
+gd_GB.UTF-8|Scots Gaelic Great Britain
+gez_ER.UTF-8|Ge'ez Eritrea
+gez_ET.UTF-8|Ge'ez Ethiopia
+gl_ES.UTF-8|Galician Spain
+gu_IN.UTF-8|Gujarati Language Locale For India
+gv_GB.UTF-8|Manx Gaelic Britain
+ha_NG.UTF-8|Hausa Nigeria
+hak_TW.UTF-8|Hakka Chinese the Republic of China
+he_IL.UTF-8|Hebrew Israel
+hi_IN.UTF-8|Hindi India
+hif_FJ.UTF-8|Fiji Hindi (Latin) Fiji
+hne_IN.UTF-8|Chhattisgarhi India
+hr_HR.UTF-8|Croatian Croatia
+hsb_DE.UTF-8|Upper Sorbian Germany
+ht_HT.UTF-8|Kreyol Haiti
+hu_HU.UTF-8|Hungarian Hungary
+hy_AM.UTF-8|Armenian Armenia
+ia_FR.UTF-8|Interlingua France
+id_ID.UTF-8|Indonesian Indonesia
+ig_NG.UTF-8|Igbo Nigeria
+ik_CA.UTF-8|Inupiaq Canada
+is_IS.UTF-8|Icelandic Iceland
+it_CH.UTF-8|Italian Switzerland
+it_IT.UTF-8|Italian Italy
+iu_CA.UTF-8|Inuktitut Nunavut, Canada
+ja_JP.UTF-8|Japanese Japan
+ka_GE.UTF-8|Georgian Georgia
+kab_DZ.UTF-8|Kabyle Algeria
+kk_KZ.UTF-8|Kazakh Kazakhstan
+kl_GL.UTF-8|Greenlandic Greenland
+km_KH.UTF-8|Khmer Cambodia
+kn_IN.UTF-8|Kannada India
+ko_KR.UTF-8|Korean Republic of Korea
+kok_IN.UTF-8|Konkani India
+ks_IN.UTF-8|Kashmiri India
+ku_TR.UTF-8|Kurdish (latin) Türkiye
+kv_RU.UTF-8|Komi Russia
+kw_GB.UTF-8|Cornish Britain
+ky_KG.UTF-8|Kyrgyz Language Locale for Kyrgyzstan
+lb_LU.UTF-8|Luxembourgish Luxembourg
+lg_UG.UTF-8|Luganda Uganda
+li_BE.UTF-8|Limburgish Language Locale for Belgium
+li_NL.UTF-8|Limburgish Language Locale for the Netherlands
+lij_IT.UTF-8|Ligurian Italy
+ln_CD.UTF-8|Lingala Democratic Republic of the Congo
+lo_LA.UTF-8|Lao Laos
+lt_LT.UTF-8|Lithuanian Lithuania
+lv_LV.UTF-8|Latvian Latvia
+lzh_TW.UTF-8|Literary Chinese the Republic of China
+mag_IN.UTF-8|Magahi India
+mai_IN.UTF-8|Maithili India
+mai_NP.UTF-8|Maithili Nepal
+mfe_MU.UTF-8|Morisyen Mauritius
+mg_MG.UTF-8|Malagasy Madagascar
+mhr_RU.UTF-8|Mari Russia
+mi_NZ.UTF-8|Maori New Zealand
+miq_NI.UTF-8|Miskito Nicaragua
+mjw_IN.UTF-8|Karbi India
+mk_MK.UTF-8|Macedonian Macedonia
+ml_IN.UTF-8|Malayalam India
+mn_MN.UTF-8|Mongolian Mongolia
+mni_IN.UTF-8|Manipuri India
+mnw_MM.UTF-8|Mon Myanmar
+mr_IN.UTF-8|Marathi India
+ms_MY.UTF-8|Malay Malaysia
+mt_MT.UTF-8|Maltese Malta
+my_MM.UTF-8|Burmese Myanmar
+nan_TW.UTF-8|Min Nan Chinese the Republic of China
+nb_NO.UTF-8|Norwegian (Bokmål) Norway
+nds_DE.UTF-8|Low(lands) Saxon Language Locale for Germany
+nds_NL.UTF-8|Low(lands) Saxon Language Locale for the Netherlands
+ne_NP.UTF-8|Nepali Nepal
+nhn_MX.UTF-8|Central Nahuatl for Mexico
+niu_NU.UTF-8|Niuean (Vagahau Niue) Niue
+niu_NZ.UTF-8|Niuean (Vagahau Niue) New Zealand
+nl_AW.UTF-8|Dutch Aruba
+nl_BE.UTF-8|Dutch Belgium
+nl_NL.UTF-8|Dutch the Netherlands
+nn_NO.UTF-8|Nynorsk Norway
+nr_ZA.UTF-8|Southern Ndebele South Africa
+nso_ZA.UTF-8|Northern Sotho South Africa
+oc_FR.UTF-8|Occitan Language Locale for France
+om_ET.UTF-8|Oromo Ethiopia
+om_KE.UTF-8|Oromo Kenya
+or_IN.UTF-8|Odia India
+os_RU.UTF-8|Ossetian Russia
+pa_IN.UTF-8|Punjabi Indian Punjabi(Gurmukhi)
+pa_PK.UTF-8|Punjabi (Shahmukhi) Language Locale for Pakistan
+pap_AW.UTF-8|Papiamento Language for Aruba
+pap_CW.UTF-8|Papiamento for Curaçao
+pl_PL.UTF-8|Polish Poland
+ps_AF.UTF-8|Pashto Afghanistan
+pt_BR.UTF-8|Portuguese Brasil
+pt_PT.UTF-8|Portuguese Portugal
+quz_PE.UTF-8|Cusco Quechua Peru
+raj_IN.UTF-8|Rajasthani India
+rif_MA.UTF-8|Tarifit Morocco
+ro_RO.UTF-8|Romanian Romania
+ru_RU.UTF-8|Russian Russia
+ru_UA.UTF-8|Russian Ukraine
+rw_RW.UTF-8|Kinyarwanda Rwanda
+sa_IN.UTF-8|Sanskrit India
+sah_RU.UTF-8|Sakha (Yakut) Russian Federation
+sat_IN.UTF-8|Santali India
+sc_IT.UTF-8|Sardinian Italy
+sd_IN.UTF-8|Sindhi India
+sd_PK.UTF-8|Sindhi Pakistan
+se_NO.UTF-8|Northern Saami Norway
+sgs_LT.UTF-8|Samogitian Lithuania
+shn_MM.UTF-8|Shan Myanmar
+shs_CA.UTF-8|Shuswap Canada
+si_LK.UTF-8|Sinhala Sri Lanka
+sid_ET.UTF-8|Sidama Ethiopia
+sk_SK.UTF-8|Slovak Slovak
+sl_SI.UTF-8|Slovenian Slovenia
+sm_WS.UTF-8|Samoan Samoa
+so_DJ.UTF-8|Somali Djibouti
+so_ET.UTF-8|Somali Ethiopia
+so_KE.UTF-8|Somali Kenya
+so_SO.UTF-8|Somali Somalia
+sq_AL.UTF-8|Albanian Albania
+sq_MK.UTF-8|Albanian Macedonia
+sr_ME.UTF-8|Serbian Montenegro
+sr_RS.UTF-8|Serbian Serbia
+ss_ZA.UTF-8|Swati South Africa
+ssy_ER.UTF-8|Saho Eritrea
+st_ZA.UTF-8|Sotho South Africa
+su_ID.UTF-8|Sundanese Indonesia
+sv_FI.UTF-8|Swedish Finland
+sv_SE.UTF-8|Swedish Sweden
+sw_KE.UTF-8|Swahili Kenya
+sw_TZ.UTF-8|Swahili Tanzania
+szl_PL.UTF-8|Silesian Poland
+ta_IN.UTF-8|Tamil India
+ta_LK.UTF-8|Tamil Sri Lanka
+tcy_IN.UTF-8|Tulu India
+te_IN.UTF-8|Telugu India
+tg_TJ.UTF-8|Tajik Tajikistan
+th_TH.UTF-8|Thai Thailand
+the_NP.UTF-8|Tharu Nepal
+ti_ER.UTF-8|Tigrigna Eritrea
+ti_ET.UTF-8|Tigrigna Ethiopia
+tig_ER.UTF-8|Tigre Eritrea
+tk_TM.UTF-8|Turkmen Turkmenistan
+tl_PH.UTF-8|Tagalog Philippines
+tn_ZA.UTF-8|Tswana South Africa
+to_TO.UTF-8|Tongan Tonga
+tpi_PG.UTF-8|Tok Pisin Papua New Guinea
+tr_CY.UTF-8|Turkish Cyprus
+tr_TR.UTF-8|Turkish Türkiye
+ts_ZA.UTF-8|Tsonga South Africa
+tt_RU.UTF-8|Tatar Russia
+ug_CN.UTF-8|Uyghur China
+uk_UA.UTF-8|Ukrainian Language Locale for Ukraine
+unm_US.UTF-8|Unami Delaware the USA
+ur_IN.UTF-8|Urdu India
+ur_PK.UTF-8|Urdu Language Locale for Pakistan
+uz_UZ.UTF-8|Uzbek (latin) Uzbekistan
+ve_ZA.UTF-8|Venda South Africa
+vi_VN.UTF-8|Vietnamese Vietnam
+wa_BE.UTF-8|Walloon Language Locale for Belgium
+wae_CH.UTF-8|Walser Switzerland
+wal_ET.UTF-8|Walaita Ethiopia
+wo_SN.UTF-8|Wolof Senegal
+xh_ZA.UTF-8|Xhosa South Africa
+yi_US.UTF-8|Yiddish Language the USA
+yo_NG.UTF-8|Yoruba Nigeria
+yue_HK.UTF-8|Yue Chinese (Cantonese) Hong Kong
+yuw_PG.UTF-8|Yau/Nungon Papua New Guinea
+zgh_MA.UTF-8|Tamazight Morocco
+zh_CN.UTF-8|Chinese Peoples Republic of China
+zh_HK.UTF-8|Chinese Hong Kong
+zh_SG.UTF-8|Chinese Singapore
+zh_TW.UTF-8|Chinese Taiwan R.O.C
+zu_ZA.UTF-8|Zulu South Africa
