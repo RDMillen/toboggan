@@ -45,6 +45,8 @@ cd toboggan
 
 * Currently, USE flag requirement are not automatically satisfied. The Console/Basic install works, however some desktop environment options require additional flags of which I am currently working on a method of adding missing flags, then re-running the previous failed emerge.
 
+* EFIStub is not currently working correctly. WIP.
+
 ## Issues and PRs 
 
 Please report issues or submit PRs at your leisure. 
