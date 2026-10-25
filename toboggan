@@ -115,6 +115,7 @@ install_run() {
   cstep cpuflags   "Detecting CPU instruction set flags"
   cstep locale     "Generating locales"
   cstep world      "Updating @world (can take a while)"
+  cstep fstools    "Installing filesystem and encryption tools"
   cstep base       "Installing firmware and system tools"
   cstep bootloader "Installing the $G_BOOTLOADER bootloader"
   kernel_install

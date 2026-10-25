@@ -105,12 +105,20 @@ s_world() {
   em --update --deep --newuse @world
 }
 
-s_base() {
-  local p=(sys-kernel/linux-firmware sys-kernel/installkernel sys-fs/dosfstools
-           sys-apps/pciutils sys-apps/usbutils app-admin/sudo app-shells/bash-completion)
-  if grep -q GenuineIntel /proc/cpuinfo; then p+=(sys-firmware/intel-microcode); fi
+# Filesystem and encryption tools, installed on their own before anything
+# that can pull in a kernel: installing a kernel builds the initramfs straight
+# away, and dracut and ugrd both need btrfs / cryptsetup to be present.
+s_fstools() {
+  local p=(sys-fs/dosfstools)
   case $G_FS in xfs) p+=(sys-fs/xfsprogs) ;; btrfs) p+=(sys-fs/btrfs-progs) ;; esac
   if [[ $G_LUKS == yes ]]; then p+=(sys-fs/cryptsetup); fi
+  em --noreplace "${p[@]}"
+}
+
+s_base() {
+  local p=(sys-kernel/linux-firmware sys-kernel/installkernel
+           sys-apps/pciutils sys-apps/usbutils app-admin/sudo app-shells/bash-completion)
+  if grep -q GenuineIntel /proc/cpuinfo; then p+=(sys-firmware/intel-microcode); fi
   case $G_INITRAMFS in dracut) p+=(sys-kernel/dracut) ;; ugrd) p+=(sys-kernel/ugrd) ;; esac
   if [[ $G_BOOTMODE == uefi ]]; then p+=(sys-boot/efibootmgr); fi
   if [[ $G_NET == networkmanager ]]; then p+=(net-misc/networkmanager); else p+=(net-misc/dhcpcd); fi
