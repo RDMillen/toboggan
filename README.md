@@ -17,9 +17,10 @@ For those who may stumble upon this page and see it as a quick way to land on a 
 ## What it does
 
 * Partitioning
-* Stage3 selection
-* Configuring Portage through `make.conf`
+* Init system and DE/WM selection
+* Initial configuring of Portage
 * Kernel selection (bin or sources - it will not do the kernel work for you)
+* Initramfs (dracut or ugrd)
 * Bootloader install and configuration
 
 ## What it does not do
@@ -36,16 +37,14 @@ From your installation environment, or minimal install ISO, bring up the network
 Clone from Github and run:
 
 ```bash
-git clone https://github.com/rdmillen/toboggan.git
+git clone https://github.com/rdmillen/toboggan
 cd toboggan
 ./toboggan
 ```
 
 ## Known Issues
 
-* Currently, USE flag requirement are not automatically satisfied. The Console/Basic install works, however some desktop environment options require additional flags of which I am currently working on a method of adding missing flags, then re-running the previous failed emerge.
-
-* EFIStub is not currently working correctly. WIP.
+* Only tested on a wired machine so far, Wi-Fi process and transfer needs to be verified as functioning.
 
 ## Issues and PRs 
 
