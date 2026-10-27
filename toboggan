@@ -37,7 +37,7 @@ else
 fi
 
 TOBOGGAN_DIR=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
-for lib in common ui hw config questions wifi menu disk stage3 configure kconfig chroot kernel; do
+for lib in common ui hw config questions wifi menu power disk stage3 configure kconfig chroot kernel; do
   # shellcheck source=/dev/null
   source "$TOBOGGAN_DIR/lib/$lib.sh"
 done
@@ -104,6 +104,15 @@ confirm_install() {
 }
 
 install_run() {
+  if [[ $DRYRUN != 1 ]] && power_on_battery; then
+    if [[ $DIALOG == plain ]]; then
+      warn "Running on battery: compiling takes hours at full CPU speed. Plug in."
+    else
+      ui_choice "Running on battery" "This machine is running on battery.\n\nThe install compiles for hours with the CPU at full speed, which will likely flatten the battery part-way through. Plug in the charger, then continue." \
+        "Continue" "Quit" || { clear; exit 0; }
+    fi
+  fi
+  step "Setting the CPU to performance mode" perf_begin
   step "Partitioning $G_DISK"         disk_partition
   step "Formatting"                   disk_format
   step "Mounting filesystems"         disk_mount
@@ -132,6 +141,7 @@ main() {
   [[ $DRYRUN == 1 || $EUID -eq 0 ]] || die "Run toboggan as root from the Gentoo live medium."
   [[ $(uname -m) == x86_64 ]] || die "This version only supports amd64 (x86_64)."
   rundir_init
+  trap perf_restore EXIT   # put CPU power settings back however we exit
   log "toboggan $TOBOGGAN_VERSION starting (dry-run=$DRYRUN, target=$TARGET)"
   ui_init
   if [[ $DIALOG == plain && ( -z $ANSWERS_IN || $ASSUME_YES != 1 ) ]]; then
